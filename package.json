@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "ts-node --esm scripts/setup-topics.ts"
   },
   "dependencies": {
     "@hashgraph/hedera-agent-kit": "^4.0.0",
