@@ -9,7 +9,7 @@ interface GoalCardProps {
 
 export function GoalCard({ goal, onDonate }: GoalCardProps) {
   return (
-    <div className="group rounded-[28px] border border-white/10 bg-white/4 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-emerald-400/30 hover:bg-white/[0.07]">
+    <div className="group flex flex-col rounded-[28px] border border-white/10 bg-white/4 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-emerald-400/30 hover:bg-white/[0.07]">
       <div className="flex items-start justify-between">
         <div>
           <div className="text-2xl font-bold">{goal.name}</div>
@@ -66,7 +66,7 @@ export function GoalCard({ goal, onDonate }: GoalCardProps) {
             href={`https://hashscan.io/testnet/transaction/${goal.recentTxId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-mono text-emerald-400 hover:text-emerald-300 underline truncate block"
+            className="mb-6 text-xs font-mono text-emerald-400 hover:text-emerald-300 underline truncate block"
           >
             Latest tx: {goal.recentTxId.slice(0, 30)}…
           </a>
@@ -75,7 +75,7 @@ export function GoalCard({ goal, onDonate }: GoalCardProps) {
 
       <button
         onClick={() => onDonate(goal.id)}
-        className="mt-6 w-full rounded-2xl bg-white px-5 py-4 font-semibold text-black transition hover:bg-emerald-300 active:scale-[0.98]"
+        className="mt-auto w-full rounded-2xl bg-white px-5 py-4 font-semibold text-black transition hover:bg-emerald-300 active:scale-[0.98]"
       >
         Support &amp; Double Your Donation
       </button>
