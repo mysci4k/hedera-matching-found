@@ -21,10 +21,12 @@
     "@reown/walletkit": "^1.5.5",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/universal-provider": "^2.23.9",
+    "dotenv": "^17.4.2",
     "langchain": "^1.4.1",
     "next": "16.2.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
