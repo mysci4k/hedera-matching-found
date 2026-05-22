@@ -37,7 +37,7 @@ export function SponsorModal({ isOpen, onClose }: SponsorModalProps) {
     onClose();
   }
 
-  function handleFormSubmit(e: React.FormEvent) {
+  function handleFormSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setStep("confirm");
   }
