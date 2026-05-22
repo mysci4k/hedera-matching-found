@@ -6,7 +6,7 @@ import {
 } from "@hiero-ledger/sdk";
 import { AgentMode } from "@hashgraph/hedera-agent-kit";
 import { HederaLangchainToolkit } from "@hashgraph/hedera-agent-kit-langchain";
-import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { createAgent } from "langchain";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
@@ -146,10 +146,10 @@ Rules:
 5. If the sponsor pool is insufficient, inform the user and suggest a lower amount
 6. Communicate in English`;
 
-  return createReactAgent({
-    llm,
+  return createAgent({
+    model: llm,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tools: allTools as any,
-    prompt: systemPrompt,
+    systemPrompt,
   });
 }
