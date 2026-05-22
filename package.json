@@ -9,6 +9,11 @@
     "lint": "eslint",
     "setup": "ts-node --esm scripts/setup-topics.ts"
   },
+  "overrides": {
+    "@hashgraph/hedera-wallet-connect": {
+      "@hiero-ledger/sdk": "$@hiero-ledger/sdk"
+    }
+  },
   "dependencies": {
     "@hashgraph/hedera-agent-kit": "^4.0.0",
     "@hashgraph/hedera-agent-kit-langchain": "^1.0.0",
