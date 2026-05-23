@@ -60,9 +60,6 @@ export async function getDAppConnector(): Promise<DAppConnector> {
   await connector.init({ logger: "error" });
 
   connector.walletConnectClient?.on("session_delete", () => {
-    console.log(
-      "[WalletConnect] session_delete – resetting connector singleton",
-    );
     _connector = null;
   });
 

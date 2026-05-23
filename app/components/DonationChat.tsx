@@ -125,7 +125,6 @@ export function DonationChat({
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const data = line.slice(6);
-            console.log("[DonationChat] SSE line:", data.slice(0, 120));
             if (data === "[DONE]") break;
             try {
               const parsed = JSON.parse(data);
@@ -169,14 +168,6 @@ export function DonationChat({
         } = requestSignaturePayload;
         const userAccount = accountId.trim();
 
-        console.log("[DonationChat] REQUEST_SIGNATURE detected", {
-          goalId,
-          userAmountHbar,
-          matchedAmount,
-          charityAccount,
-          userAccount,
-        });
-
         if (!userAccount) {
           setMessages((prev) => [
             ...prev,
@@ -201,12 +192,7 @@ export function DonationChat({
 
         let signedTxBytes: string;
         try {
-          console.log("[DonationChat] calling requestSignatureViaWallet...");
           signedTxBytes = await requestSignatureViaWallet(txBytes, userAccount);
-          console.log(
-            "[DonationChat] wallet signed successfully, signedTxBytes length:",
-            signedTxBytes.length,
-          );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (walletErr: any) {
           console.error("[DonationChat] wallet signing failed:", walletErr);
@@ -243,7 +229,6 @@ export function DonationChat({
           });
 
           const execData = await execRes.json();
-          console.log("[DonationChat] /api/execute response:", execData);
 
           if (execData.success) {
             setMessages((prev) => [
