@@ -112,6 +112,7 @@ export function DonationChat({
         matchedAmount: number;
         sponsorAccount: string;
         charityAccount: string;
+        donationsTopicId: string;
         summary: string;
       } | null = null;
 
@@ -164,7 +165,9 @@ export function DonationChat({
           goalId,
           userAmountHbar,
           matchedAmount,
+          sponsorAccount,
           charityAccount,
+          donationsTopicId,
         } = requestSignaturePayload;
         const userAccount = accountId.trim();
 
@@ -225,19 +228,78 @@ export function DonationChat({
               userAmountHbar,
               matchedAmount,
               charityAccount,
+              sponsorAccount,
+              donationsTopicId,
             }),
           });
 
           const execData = await execRes.json();
 
           if (execData.success) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                role: "agent",
-                content: `Donation complete! Your ${userAmountHbar} HBAR donation (plus ${matchedAmount} HBAR matched by the sponsor) has been sent.\n\nView on HashScan: ${execData.hashscanUrl}`,
-              },
-            ]);
+            const completionMessage =
+              `User donation confirmed on Hedera. txId: ${execData.txId}. ` +
+              `Now please execute the sponsor matching: transfer ${matchedAmount} HBAR ` +
+              `from sponsor account ${sponsorAccount} to charity account ${charityAccount} ` +
+              `using the allowance (TRANSFER_HBAR_WITH_ALLOWANCE_TOOL). ` +
+              `Then record the event on HCS topic ${donationsTopicId} using SUBMIT_TOPIC_MESSAGE_TOOL ` +
+              `with this JSON message: ${JSON.stringify({
+                type: "DONATION_MATCHED",
+                goalId,
+                userAmount: userAmountHbar,
+                matchedAmount,
+                totalSent: userAmountHbar + matchedAmount,
+                charityAccount,
+                txId: execData.txId,
+                timestamp: Date.now(),
+              })}`;
+
+            const updatedHistory = [
+              ...newMessages,
+              { role: "assistant" as const, content: agentText },
+            ].map((m) => ({
+              role: m.role === "user" ? "user" : "assistant",
+              content: m.content,
+            }));
+
+            const completionRes = await fetch("/api/agent", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                message: completionMessage,
+                history: updatedHistory,
+              }),
+            });
+
+            const completionReader = completionRes.body!.getReader();
+            let completionText = "";
+
+            setMessages((prev) => [...prev, { role: "agent", content: "" }]);
+
+            while (true) {
+              const { done, value } = await completionReader.read();
+              if (done) break;
+              const text = decoder.decode(value);
+              for (const line of text.split("\n")) {
+                if (line.startsWith("data: ")) {
+                  const data = line.slice(6);
+                  if (data === "[DONE]") break;
+                  try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.text) {
+                      completionText += parsed.text;
+                      setMessages((prev) => {
+                        const updated = [...prev];
+                        updated[updated.length - 1] = {
+                          role: "agent",
+                          content: completionText,
+                        };
+                        return updated;
+                      });
+                    }
+                  } catch {}
+                }
+              }
+            }
           } else {
             setMessages((prev) => [
               ...prev,
