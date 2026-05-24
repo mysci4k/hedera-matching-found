@@ -238,9 +238,10 @@ export function DonationChat({
           if (execData.success) {
             const completionMessage =
               `User donation confirmed on Hedera. txId: ${execData.txId}. ` +
+              `User transaction Hashscan link: ${execData.hashscanUrl}. ` +
               `Now please execute the sponsor matching: transfer ${matchedAmount} HBAR ` +
               `from sponsor account ${sponsorAccount} to charity account ${charityAccount} ` +
-              `using the allowance (TRANSFER_HBAR_WITH_ALLOWANCE_TOOL). ` +
+              `using the allowance (transfer_hbar_with_allowance_tool). ` +
               `Then record the event on HCS topic ${donationsTopicId} using SUBMIT_TOPIC_MESSAGE_TOOL ` +
               `with this JSON message: ${JSON.stringify({
                 type: "DONATION_MATCHED",
@@ -251,7 +252,10 @@ export function DonationChat({
                 charityAccount,
                 txId: execData.txId,
                 timestamp: Date.now(),
-              })}`;
+              })}. ` +
+              `After both steps succeed, end with a summary that includes plain text links (no markdown) to both transactions: ` +
+              `the user donation link already provided above, and the sponsor matching link ` +
+              `(format: https://hashscan.io/testnet/transaction/<sponsorTxId> where sponsorTxId comes from the transfer_hbar_with_allowance_tool response).`;
 
             const updatedHistory = [
               ...newMessages,
