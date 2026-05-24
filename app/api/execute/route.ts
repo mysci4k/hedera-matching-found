@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { Transaction } from "@hiero-ledger/sdk";
 import { getHederaClient } from "@/lib/hedera-client";
-import { submitHCSMessage } from "@/lib/hcs";
 
 export async function POST(req: Request) {
   const {
@@ -10,6 +9,8 @@ export async function POST(req: Request) {
     userAmountHbar,
     matchedAmount,
     charityAccount,
+    sponsorAccount,
+    donationsTopicId,
   } = await req.json();
 
   if (!signedTxBytes || !goalId) {
@@ -35,23 +36,16 @@ export async function POST(req: Request) {
       throw new Error(`Transaction failed with status: ${receipt.status}`);
     }
 
-    const totalSent = (userAmountHbar ?? 0) + (matchedAmount ?? 0);
-
-    await submitHCSMessage(client, process.env.TOPIC_DONATIONS!, {
-      type: "DONATION_MATCHED",
-      goalId,
-      userAmount: userAmountHbar ?? 0,
-      matchedAmount: matchedAmount ?? 0,
-      totalSent,
-      charityAccount,
-      txId,
-      timestamp: Date.now(),
-    });
-
     return NextResponse.json({
       success: true,
       txId,
       hashscanUrl: `https://hashscan.io/testnet/transaction/${txId}`,
+      goalId,
+      userAmountHbar: userAmountHbar ?? 0,
+      matchedAmount: matchedAmount ?? 0,
+      charityAccount,
+      sponsorAccount,
+      donationsTopicId,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
