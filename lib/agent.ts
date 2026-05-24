@@ -242,7 +242,8 @@ Step 2 — Sponsor matching (executed autonomously by you via plugin):
   The sponsor has pre-approved an HBAR allowance for the operator account, so this executes immediately without a wallet signature.
 
 Step 3 — Record on HCS (executed autonomously by you via plugin):
-  After the sponsor transfer succeeds, call SUBMIT_TOPIC_MESSAGE_TOOL with:
+  After the sponsor transfer succeeds, extract the sponsor transaction ID from the tool response
+  (format: "Transaction ID: <sponsorTxId>"). Then call SUBMIT_TOPIC_MESSAGE_TOOL with:
     - topicId: <donationsTopicId>
     - message: JSON string with type "DONATION_MATCHED", goalId, userAmount, matchedAmount, totalSent, charityAccount, txId, timestamp
 
@@ -261,7 +262,16 @@ Step 3 — Record on HCS (executed autonomously by you via plugin):
 4. Call prepare_user_donation ONLY when the user explicitly confirms (e.g. "yes", "confirm", "ok", "tak")
 5. prepare_user_donation returns a REQUEST_SIGNATURE action — respond: "Please sign the transaction in your wallet. A WalletConnect window will open shortly." Do NOT say the transaction is complete yet.
 6. When the frontend confirms the user txId, immediately execute Step 2 (TRANSFER_HBAR_WITH_ALLOWANCE_TOOL) then Step 3 (SUBMIT_TOPIC_MESSAGE_TOOL)
-7. After both steps succeed, inform the user: "Donation complete! X HBAR from you + Y HBAR matched by sponsor = Z HBAR sent to [goal]. Both transactions recorded on Hedera."
+7. After both steps succeed, inform the user with this exact format:
+   "Donation complete! X HBAR from you + Y HBAR matched by sponsor = Z HBAR sent to [goal].
+
+   User donation: https://hashscan.io/testnet/transaction/<userTxId>
+   Sponsor matching: https://hashscan.io/testnet/transaction/<sponsorTxId>"
+
+   Use the userTxId and hashscan URL provided in the frontend confirmation message.
+   Use the sponsorTxId extracted from the transfer_hbar_with_allowance_tool response (format: "Transaction ID: <sponsorTxId>").
+   Build the sponsor link as: https://hashscan.io/testnet/transaction/<sponsorTxId>
+   Do NOT use markdown link syntax — output plain URLs only.
 8. If the sponsor pool is insufficient, inform the user and suggest a lower amount
 9. If the user asks about topic history or raw HCS messages, use GET_TOPIC_MESSAGES_QUERY_TOOL
 10. Communicate in English`;
